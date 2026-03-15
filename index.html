@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixMyRecord — See What They See. Fix What They Find.</title>
+<meta name="description" content="Free AI-powered reputation scan. See what employers, landlords, and AI platforms find when they search your name. Court records, mugshots, data brokers, and more.">
+
+<!-- OG Tags -->
+<meta property="og:title" content="FixMyRecord — See What They See. Fix What They Find.">
+<meta property="og:description" content="Free AI-powered reputation scan. See what employers, landlords, and AI platforms find when they search your name. Court records, mugshots, data brokers, and more.">
+<meta property="og:url" content="https://fixmyrecord.io">
+<meta property="og:type" content="website">
+
+<!-- Replace GA_MEASUREMENT_ID with your actual Google Analytics 4 measurement ID -->
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0c1b33;
+  --deep: #132743;
+  --accent: #3b82f6;
+  --accent-bright: #60a5fa;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --green: #10b981;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-bright: #f8fafc;
+  --surface: #1a2a44;
+  --border: rgba(255,255,255,0.06);
+  --border-accent: rgba(59, 130, 246, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+.container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+/* ── NAV ── */
+nav {
+  padding: 18px 0;
+  background: rgba(12, 27, 51, 0.95);
+  border-bottom: 1px solid var(--border);
+}
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+}
+.logo {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
+  text-decoration: none;
+}
+.logo span { color: var(--accent-bright); }
+
+/* ── HERO ── */
+.hero {
+  padding: 80px 0 60px;
+  text-align: center;
+}
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  color: var(--text-bright);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--text-dim);
+  max-width: 560px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+/* ── FCRA DISCLAIMER ── */
+.fcra-disclaimer {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-width: 520px;
+  margin: 0 auto 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── FORM ── */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.form-card h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  text-align: center;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-bright);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-group input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.honeypot { display: none !important; }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  margin-top: 8px;
+}
+.btn-submit:hover { background: #2563eb; transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.form-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 16px;
+}
+
+/* ── HOW IT WORKS ── */
+.how-it-works {
+  padding: 60px 0;
+}
+.how-it-works h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 32px;
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.step-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-align: center;
+}
+.step-number {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.step-item h3 {
+  font-size: 16px;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+}
+.step-item p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── WHAT WE CHECK ── */
+.checks {
+  padding: 60px 0;
+}
+.checks h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 32px;
+}
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.check-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+.check-item h3 {
+  font-size: 15px;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+.check-item p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.check-item .stat {
+  font-size: 11px;
+  color: var(--accent-bright);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* ── SAMPLE REPORT ── */
+.sample-report {
+  padding: 60px 0;
+}
+.sample-report h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 32px;
+}
+.sample-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.sample-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 24px;
+  text-align: center;
+}
+.sample-card h3 {
+  font-size: 16px;
+  color: var(--text-bright);
+  margin-bottom: 16px;
+}
+.sample-score {
+  font-size: 56px;
+  font-weight: 800;
+  font-family: 'Fraunces', serif;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.sample-grade {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.sample-stats {
+  list-style: none;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.sample-stats li {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sample-stats li:last-child { border-bottom: none; }
+.sample-card .cta-text {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.btn-sample {
+  display: inline-block;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-sample:hover { background: #2563eb; transform: translateY(-1px); }
+
+/* ── SOCIAL PROOF ── */
+.social-proof {
+  padding: 60px 0;
+}
+.social-proof h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.social-proof .subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.proof-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+.proof-stat {
+  text-align: center;
+}
+.proof-stat .number {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-bright);
+  font-family: 'Fraunces', serif;
+}
+.proof-stat .label {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ── PRICING ── */
+.pricing {
+  padding: 60px 0;
+}
+.pricing h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: var(--text-bright);
+  text-align: center;
+  margin-bottom: 32px;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+}
+.pricing-card.featured {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.pricing-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+}
+.pricing-card .price {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-bright);
+  margin-bottom: 16px;
+}
+.pricing-card .price small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+.pricing-card ul {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.pricing-card ul li {
+  font-size: 13px;
+  color: var(--text-dim);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pricing-card ul li:last-child { border-bottom: none; }
+
+/* ── SUCCESS / ERROR ── */
+.msg-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  color: var(--green);
+  font-size: 16px;
+  display: none;
+}
+.msg-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  color: var(--red);
+  font-size: 14px;
+  display: none;
+  margin-bottom: 16px;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+footer p {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+footer a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+footer a:hover { color: var(--accent-bright); }
+.footer-disclaimer {
+  font-size: 11px;
+  color: var(--text-dim);
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .form-card { padding: 24px; }
+  .form-row { grid-template-columns: 1fr; }
+  .hero { padding: 60px 0 40px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .sample-grid { grid-template-columns: 1fr; }
+  .proof-stats { flex-direction: column; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="logo">Fix<span>MyRecord</span></a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <h1>See what they see. Fix what they find.</h1>
+    <p>Free AI-powered reputation scan. See what employers, landlords, and AI platforms find when they search your name. Court records, mugshots, data brokers, and more.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+
+    <div class="fcra-disclaimer">
+      FixMyRecord is not a consumer reporting agency. This is not a background check. Reports are for personal informational use only.
+    </div>
+
+    <div class="form-card">
+      <h2>Start Your Free Scan</h2>
+
+      <div id="errorMsg" class="msg-error"></div>
+
+      <form id="auditForm" onsubmit="return submitForm(event)">
+        <div class="form-group">
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" name="full_name" placeholder="John Smith" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" placeholder="Indianapolis" required>
+          </div>
+          <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" placeholder="Indiana" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email (for report delivery)</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="attack_sites">Known attack or defamatory sites <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="attack_sites" name="attack_sites" rows="2" placeholder="e.g. attacksite.com, defamatory-page.net" style="width:100%;padding:12px 16px;background:var(--navy);border:1px solid var(--border);border-radius:8px;color:var(--text-bright);font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Honeypot -->
+        <div class="honeypot">
+          <input type="text" name="website_url" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Scan My Reputation</button>
+
+        <p class="form-note">Free scan includes score, grade, and summary. Full details available in paid report.</p>
+      </form>
+
+      <div id="successMsg" class="msg-success">
+        <strong>Your scan is running!</strong><br>
+        Check your email — you'll receive your reputation report within minutes.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="container">
+    <h2>How It Works</h2>
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h3>Enter your name</h3>
+        <p>Your full name, city, and state. That's all we need. No credit card for the free scan.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h3>We scan everything</h3>
+        <p>Google, ChatGPT, Gemini, court records, mugshot sites, and 10 data broker databases. Results in under 5 minutes.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h3>Get your report</h3>
+        <p>A scored PDF report with your reputation grade, every finding, and a clear action plan. Delivered to your email.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="checks">
+  <div class="container">
+    <h2>What We Find</h2>
+    <div class="check-grid">
+      <div class="check-item">
+        <h3>Google Search</h3>
+        <p>10 targeted queries including your name + "arrest", "criminal record", "mugshot" — what employers actually search.</p>
+        <div class="stat">100 results analyzed per scan</div>
+      </div>
+      <div class="check-item">
+        <h3>AI Platforms</h3>
+        <p>What ChatGPT and Gemini say about you when asked directly. The new background check.</p>
+        <div class="stat">400M+ weekly ChatGPT users</div>
+      </div>
+      <div class="check-item">
+        <h3>Court Records</h3>
+        <p>Checked across JudyRecords, UniCourt, CourtListener, and PACER for any public court filings tied to your name.</p>
+        <div class="stat">4 databases checked</div>
+      </div>
+      <div class="check-item">
+        <h3>Mugshot Sites</h3>
+        <p>5 major mugshot databases that employers, landlords, and dates frequently check before making decisions.</p>
+        <div class="stat">5 sites scanned</div>
+      </div>
+      <div class="check-item">
+        <h3>Data Brokers</h3>
+        <p>10 sites that sell your personal info — address, phone, relatives — to anyone willing to pay.</p>
+        <div class="stat">10 brokers checked</div>
+      </div>
+      <div class="check-item">
+        <h3>Scored Report</h3>
+        <p>0-100 reputation score with A-F letter grade. Know exactly where you stand and what to fix first.</p>
+        <div class="stat">Prioritized action plan included</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sample-report" id="sample">
+  <div class="container">
+    <h2>See a Sample Report</h2>
+    <div class="sample-grid">
+      <div class="sample-card" id="sampleScoreCard">
+        <h3>Sample Score</h3>
+        <div class="sample-score" id="sampleScoreValue" style="color: var(--accent-bright);">--</div>
+        <div class="sample-grade" id="sampleGradeValue" style="color: var(--text-dim);">Loading...</div>
+        <ul class="sample-stats" id="sampleStats">
+          <li>Score and grade will load from sample data</li>
+        </ul>
+      </div>
+      <div class="sample-card">
+        <h3>Your Report</h3>
+        <p class="cta-text">Your report includes your reputation score, every finding across Google, AI platforms, court records, mugshot sites, and data brokers — plus a prioritized action plan.</p>
+        <a href="/sample_report.pdf" class="btn-sample" target="_blank">View Sample Report</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="social-proof">
+  <div class="container">
+    <h2>Trusted Nationwide</h2>
+    <p class="subtitle">Helping individuals take control of their online reputation</p>
+    <div class="proof-stats">
+      <div class="proof-stat">
+        <div class="number" id="scanCount">--</div>
+        <div class="label">Scans completed</div>
+      </div>
+      <div class="proof-stat">
+        <div class="number" id="reportCount">--</div>
+        <div class="label">Reports delivered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing">
+  <div class="container">
+    <h2>Choose Your Report</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Free Scan</h3>
+        <div class="price">$0</div>
+        <ul>
+          <li>Reputation score &amp; grade</li>
+          <li>Summary of findings</li>
+          <li>URLs and AI responses masked</li>
+          <li>Preview of action plan</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <h3>Full Report</h3>
+        <div class="price">$29 <small>one-time</small></div>
+        <ul>
+          <li>Everything in Free Scan</li>
+          <li>All URLs and snippets unmasked</li>
+          <li>Full AI platform responses</li>
+          <li>Complete action plan</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <h3>Full + Removal Guide</h3>
+        <div class="price">$99 <small>one-time</small></div>
+        <ul>
+          <li>Everything in Full Report</li>
+          <li>Per-site removal instructions</li>
+          <li>Email templates for takedowns</li>
+          <li>State expungement resources</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>&copy; 2026 Resilient Capital LLC</p>
+    <p style="margin-top: 8px;"><a href="/privacy.html">Privacy Policy</a> &middot; <a href="/terms.html">Terms of Service</a></p>
+    <p class="footer-disclaimer">Not a consumer report under the FCRA. Not legal advice. Results based on publicly available information.</p>
+  </div>
+</footer>
+
+<script>
+async function submitForm(e) {
+  e.preventDefault();
+
+  const btn = document.getElementById('submitBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const successMsg = document.getElementById('successMsg');
+  const form = document.getElementById('auditForm');
+
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  errorMsg.style.display = 'none';
+
+  // GA: track scan start
+  if (typeof gtag === 'function') {
+    gtag('event', 'scan_start', { event_category: 'engagement', event_label: 'free_scan' });
+  }
+
+  const data = {
+    full_name: document.getElementById('full_name').value.trim(),
+    city: document.getElementById('city').value.trim(),
+    state: document.getElementById('state').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    website_url: document.querySelector('[name="website_url"]').value,
+    attack_sites: document.getElementById('attack_sites').value.trim()
+  };
+
+  try {
+    const resp = await fetch('/api/reputation/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await resp.json();
+
+    if (resp.ok && result.success) {
+      form.style.display = 'none';
+      successMsg.style.display = 'block';
+      // GA: track scan completion
+      if (typeof gtag === 'function') {
+        gtag('event', 'scan_complete', { event_category: 'conversion', event_label: 'free_scan' });
+      }
+    } else {
+      errorMsg.textContent = result.error || 'Something went wrong. Please try again.';
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Scan My Reputation';
+    }
+  } catch (err) {
+    errorMsg.textContent = 'Connection error. Please try again.';
+    errorMsg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Scan My Reputation';
+  }
+
+  return false;
+}
+
+// Load stats from API
+(async function() {
+  try {
+    const resp = await fetch('/api/reputation/stats');
+    if (resp.ok) {
+      const stats = await resp.json();
+      document.getElementById('scanCount').textContent = stats.scans || '--';
+      document.getElementById('reportCount').textContent = stats.reports || '--';
+      if (stats.sample_score !== undefined) {
+        const score = stats.sample_score;
+        const grade = stats.sample_grade || '--';
+        const gradeLabel = stats.sample_grade_label || '';
+        const scoreEl = document.getElementById('sampleScoreValue');
+        const gradeEl = document.getElementById('sampleGradeValue');
+        scoreEl.textContent = score;
+        gradeEl.textContent = grade + (gradeLabel ? ' — ' + gradeLabel : '');
+        // Color the score
+        if (score >= 90) { scoreEl.style.color = '#10b981'; gradeEl.style.color = '#10b981'; }
+        else if (score >= 75) { scoreEl.style.color = '#10b981'; gradeEl.style.color = '#10b981'; }
+        else if (score >= 50) { scoreEl.style.color = '#f59e0b'; gradeEl.style.color = '#f59e0b'; }
+        else if (score >= 25) { scoreEl.style.color = '#f97316'; gradeEl.style.color = '#f97316'; }
+        else { scoreEl.style.color = '#ef4444'; gradeEl.style.color = '#ef4444'; }
+        // Stats
+        const statsEl = document.getElementById('sampleStats');
+        const items = [];
+        if (stats.sample_google_neg !== undefined) items.push('<li>Google negative results: ' + stats.sample_google_neg + '</li>');
+        if (stats.sample_brokers !== undefined) items.push('<li>Data brokers with your info: ' + stats.sample_brokers + '/10</li>');
+        if (stats.sample_chatgpt !== undefined) items.push('<li>ChatGPT verdict: ' + stats.sample_chatgpt + '</li>');
+        if (stats.sample_gemini !== undefined) items.push('<li>Gemini verdict: ' + stats.sample_gemini + '</li>');
+        if (items.length) statsEl.innerHTML = items.join('');
+      }
+    }
+  } catch(e) {
+    // Fallback to hardcoded stats if API not available
+    document.getElementById('scanCount').textContent = '3';
+    document.getElementById('reportCount').textContent = '3';
+  }
+})();
+</script>
+
+</body>
+</html>

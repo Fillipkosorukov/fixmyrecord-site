@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Replace GA_MEASUREMENT_ID with your actual Google Analytics 4 measurement ID -->
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixMyRecord Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #0c1b33; --deep: #132743; --accent: #3b82f6; --accent-bright: #60a5fa; --green: #10b981; --red: #ef4444; --orange: #f59e0b; --text: #e2e8f0; --text-dim: #94a3b8; --text-bright: #f8fafc; --surface: #1a2a44; --border: rgba(255,255,255,0.08); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; }
+
+/* Login */
+.login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 400px; width: 100%; }
+.login-box h1 { font-size: 22px; color: var(--text-bright); margin-bottom: 8px; }
+.login-box p { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+.login-box input { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text-bright); font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 16px; }
+.login-box input:focus { border-color: var(--accent); }
+.login-box button { width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.login-box button:hover { background: #2563eb; }
+.login-error { color: var(--red); font-size: 13px; margin-bottom: 12px; display: none; }
+
+/* Dashboard */
+.dashboard { display: none; }
+.top-bar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--deep); }
+.top-bar h1 { font-size: 18px; color: var(--text-bright); }
+.top-bar-right { display: flex; gap: 12px; align-items: center; }
+.btn-sm { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-sm:hover { border-color: var(--accent); color: var(--text); }
+.btn-logout { background: transparent; border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+
+/* Stats */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; padding: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.stat-num { font-size: 28px; font-weight: 700; color: var(--text-bright); }
+.stat-label { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+/* Filters */
+.filters { padding: 0 24px; margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Search box */
+.search-wrap { padding: 0 24px; margin-bottom: 16px; }
+.search-input { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px 9px 36px; color: var(--text-bright); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.868-3.834zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text-dim); }
+
+/* Table */
+.table-wrap { padding: 0 24px 24px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+td { padding: 14px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:hover { background: rgba(59, 130, 246, 0.04); }
+.lead-name { color: var(--text-bright); font-weight: 600; font-size: 15px; }
+.lead-meta { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+.lead-email a { color: var(--accent-bright); text-decoration: none; }
+.lead-email a:hover { text-decoration: underline; }
+
+/* Sortable headers */
+th.sortable { cursor: pointer; user-select: none; padding-right: 22px; }
+th.sortable:hover { color: var(--text-bright); }
+th .sort-arrow { font-size: 10px; margin-left: 4px; color: var(--accent-bright); }
+
+/* Status badges */
+.status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.status-pending { background: rgba(245,158,11,0.12); color: var(--orange); }
+.status-running { background: rgba(59,130,246,0.12); color: var(--accent-bright); }
+.status-completed { background: rgba(16,185,129,0.12); color: var(--green); }
+.status-paid { background: rgba(16,185,129,0.2); color: #34d399; }
+
+/* Grade badges */
+.grade { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 700; min-width: 32px; text-align: center; }
+.grade-A { background: rgba(16,185,129,0.15); color: var(--green); }
+.grade-B { background: rgba(46,204,113,0.15); color: #2ecc71; }
+.grade-C { background: rgba(245,158,11,0.15); color: var(--orange); }
+.grade-D { background: rgba(230,126,34,0.15); color: #e67e22; }
+.grade-F { background: rgba(239,68,68,0.15); color: var(--red); }
+
+/* Outreach badges */
+.outreach { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.outreach-not_sent { background: rgba(148,163,184,0.12); color: #94a3b8; }
+.outreach-sent { background: rgba(59,130,246,0.12); color: var(--accent-bright); }
+.outreach-replied { background: rgba(139,92,246,0.12); color: #a78bfa; }
+.outreach-converted { background: rgba(16,185,129,0.12); color: var(--green); }
+.outreach-opened { background: rgba(245,158,11,0.12); color: var(--orange); }
+.outreach-bounced { background: rgba(239,68,68,0.12); color: var(--red); }
+
+/* Actions dropdown */
+.actions-wrap { position: relative; display: inline-block; vertical-align: middle; }
+.actions-btn { background: var(--navy); border: 1px solid var(--border); color: var(--text-dim); padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.actions-btn:hover { border-color: var(--accent); }
+.actions-menu { display: none; position: absolute; right: 0; top: 100%; margin-top: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; min-width: 170px; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.actions-menu.show { display: block; }
+.actions-menu button { display: block; width: 100%; text-align: left; padding: 8px 14px; background: none; border: none; color: var(--text); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.actions-menu button:hover { background: rgba(59,130,246,0.08); }
+.actions-menu button:disabled { opacity: 0.4; cursor: default; }
+
+/* Quick PDF button */
+.pdf-quick { background: none; border: 1px solid rgba(59,130,246,0.2); color: var(--accent-bright); padding: 3px 7px; border-radius: 6px; font-size: 14px; cursor: pointer; line-height: 1; transition: all 0.15s; }
+.pdf-quick:hover { background: rgba(59,130,246,0.1); border-color: var(--accent); }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal h3 { color: var(--text-bright); margin-bottom: 12px; }
+.modal pre { background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 13px; overflow-x: auto; color: var(--green); margin-bottom: 16px; white-space: pre-wrap; word-break: break-all; }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: none; }
+.modal-btn-primary { background: var(--accent); color: #fff; }
+.modal-btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+
+/* Expandable rows */
+.lead-row { cursor: pointer; }
+.lead-row td:first-child::before { content: '\25B8 '; color: var(--text-dim); font-size: 12px; }
+.lead-row.expanded td:first-child::before { content: '\25BE '; color: var(--accent-bright); }
+.audit-history-row { display: none; }
+.audit-history-row.show { display: table-row; }
+.audit-history-row:hover { background: transparent !important; }
+.audit-history { padding: 12px 14px 16px 28px; }
+.audit-history-loading { color: var(--text-dim); font-size: 13px; padding: 8px 0; }
+.audit-list { list-style: none; }
+.audit-item { display: flex; align-items: center; gap: 14px; padding: 8px 12px; background: var(--navy); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; font-size: 13px; flex-wrap: wrap; }
+.audit-tier { font-weight: 600; color: var(--text-bright); min-width: 70px; }
+.audit-date { color: var(--text-dim); min-width: 120px; }
+.audit-pdf-link { color: var(--accent-bright); text-decoration: none; font-weight: 600; font-size: 12px; margin-left: auto; }
+.audit-pdf-link:hover { text-decoration: underline; }
+.audit-none { color: var(--text-dim); font-size: 13px; font-style: italic; }
+
+/* Notes textarea */
+.notes-wrap { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+.notes-label { font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.notes-textarea { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; resize: vertical; min-height: 60px; max-height: 200px; line-height: 1.5; }
+.notes-textarea:focus { border-color: var(--accent); }
+.notes-saved { font-size: 11px; color: var(--green); margin-top: 4px; display: none; }
+
+/* Detail panel in expanded row */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.detail-item { background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+.detail-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.detail-value { font-size: 15px; color: var(--text-bright); font-weight: 600; margin-top: 2px; }
+
+/* Tier selector */
+.tier-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.tier-option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--navy); border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+.tier-option:hover { border-color: var(--accent); }
+.tier-option.selected { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+.tier-option input[type="radio"] { display: none; }
+.tier-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.tier-option.selected .tier-radio { border-color: var(--accent); }
+.tier-option.selected .tier-radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.tier-info { flex: 1; }
+.tier-name { font-weight: 600; color: var(--text-bright); font-size: 15px; }
+.tier-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.tier-price { font-weight: 700; color: var(--accent-bright); font-size: 15px; white-space: nowrap; }
+
+/* Days ago */
+.days-ago { color: var(--text-dim); font-size: 11px; }
+.days-ago.stale { color: var(--orange); }
+
+.empty-state { text-align: center; padding: 60px 24px; color: var(--text-dim); }
+.empty-state h3 { color: var(--text-bright); margin-bottom: 8px; }
+
+@media (max-width: 768px) {
+  /* Top bar */
+  .top-bar { padding: 12px 16px; }
+  .top-bar h1 { font-size: 16px; }
+  .top-bar-right { gap: 8px; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* Stats: 2 columns on mobile */
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px; }
+  .stat-card { padding: 14px; }
+  .stat-num { font-size: 22px; }
+  .stat-label { font-size: 12px; }
+
+  /* Filters: wrap onto multiple lines */
+  .filters { padding: 0 16px; margin-bottom: 12px; gap: 6px; flex-wrap: wrap; }
+  .filter-btn { padding: 5px 12px; font-size: 12px; }
+
+  /* Search */
+  .search-wrap { padding: 0 16px; margin-bottom: 12px; }
+  .search-input { max-width: 100%; font-size: 13px; }
+
+  /* Table: horizontal scroll */
+  .table-wrap { padding: 0 16px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 700px; }
+  td, th { padding: 10px 8px; font-size: 13px; }
+
+  /* Detail panel: stack vertically */
+  .detail-grid { grid-template-columns: 1fr; }
+  .detail-item { padding: 8px 12px; }
+  .detail-value { font-size: 14px; }
+
+  /* Audit history items */
+  .audit-item { gap: 8px; padding: 8px 10px; font-size: 12px; }
+
+  /* Notes */
+  .notes-textarea { font-size: 13px; }
+
+  /* Modals */
+  .modal { padding: 20px; width: 95%; }
+  .tier-option { padding: 12px 14px; gap: 10px; }
+  .tier-name { font-size: 14px; }
+  .tier-desc { font-size: 11px; }
+  .tier-price { font-size: 14px; }
+
+  /* Login */
+  .login-box { padding: 28px 20px; margin: 0 16px; }
+
+  /* Toast */
+  #toast { font-size: 13px; padding: 10px 18px; left: 16px; right: 16px; transform: none; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <h1>FixMyRecord Admin</h1>
+    <p>Enter your admin token to access the dashboard.</p>
+    <div class="login-error" id="login-error">Invalid token. Try again.</div>
+    <input type="password" id="token-input" placeholder="Admin token" autofocus>
+    <button onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="top-bar">
+    <h1>FixMyRecord Admin</h1>
+    <div class="top-bar-right">
+      <button class="btn-sm" onclick="sendAllApproved()" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:var(--green);">Send All Approved</button>
+      <button class="btn-sm" onclick="loadLeads()">Refresh</button>
+      <button class="btn-sm btn-logout" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="stats-row" id="stats-row"></div>
+
+  <div style="padding: 0 24px 16px; max-width: 600px;">
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Revenue Funnel</div>
+      <div id="revenue-funnel"></div>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="">All</button>
+    <button class="filter-btn" data-filter="pending">Pending</button>
+    <button class="filter-btn" data-filter="running">Running</button>
+    <button class="filter-btn" data-filter="completed">Completed</button>
+    <button class="filter-btn" data-filter="paid">Paid</button>
+    <span style="width:1px;height:24px;background:var(--border);margin:0 4px;"></span>
+    <button class="filter-btn" data-filter="has_email">Has Email</button>
+    <button class="filter-btn" data-filter="no_email">No Email</button>
+    <span style="width:1px;height:24px;background:var(--border);margin:0 4px;"></span>
+    <button class="filter-btn" data-filter="tier_free">Free</button>
+    <button class="filter-btn" data-filter="tier_full">Full ($29)</button>
+    <button class="filter-btn" data-filter="tier_managed">Full+Guide ($99)</button>
+    <span style="width:1px;height:24px;background:var(--border);margin:0 4px;"></span>
+    <button class="filter-btn" data-filter="outreach_not_sent">Not Sent</button>
+    <button class="filter-btn" data-filter="outreach_sent">Sent</button>
+    <button class="filter-btn" data-filter="outreach_replied">Replied</button>
+    <button class="filter-btn" data-filter="outreach_converted">Converted</button>
+  </div>
+
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="search-input" placeholder="Search by name, location, or email..." oninput="onSearch()">
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="full_name">Name <span class="sort-arrow"></span></th>
+          <th>Location</th>
+          <th>Email</th>
+          <th class="sortable" data-sort="score">Score <span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="grade">Grade <span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="tier">Tier <span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="status">Status <span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="outreach_status">Outreach <span class="sort-arrow"></span></th>
+          <th>Follow-ups</th>
+          <th class="sortable" data-sort="created_at">Date <span class="sort-arrow"></span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leads-table"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <h3>No leads yet</h3>
+      <p>Reputation scan submissions will appear here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="log-modal">
+  <div class="modal" style="max-width:700px;">
+    <h3 id="log-title">Audit Log</h3>
+    <pre id="log-content" style="max-height:400px;overflow-y:auto;font-size:12px;color:var(--text-dim);"></pre>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-secondary" onclick="closeLog()">Close</button>
+      <button class="modal-btn modal-btn-primary" onclick="refreshLog()">Refresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIER SELECTOR / CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3 id="confirm-title">Run Audit</h3>
+    <p id="confirm-subtitle" style="color:var(--text-dim);margin-bottom:16px;font-size:14px;"></p>
+    <div class="tier-options" id="tier-options">
+      <label class="tier-option selected" onclick="selectTier(this, 'free')">
+        <input type="radio" name="audit-tier" value="free" checked>
+        <div class="tier-radio"></div>
+        <div class="tier-info"><div class="tier-name">Free Scan</div><div class="tier-desc">Score, grade, masked results</div></div>
+        <div class="tier-price">$0</div>
+      </label>
+      <label class="tier-option" onclick="selectTier(this, 'full')">
+        <input type="radio" name="audit-tier" value="full">
+        <div class="tier-radio"></div>
+        <div class="tier-info"><div class="tier-name">Full Report</div><div class="tier-desc">All URLs unmasked, full AI responses, action plan</div></div>
+        <div class="tier-price">$29</div>
+      </label>
+      <label class="tier-option" onclick="selectTier(this, 'managed')">
+        <input type="radio" name="audit-tier" value="managed">
+        <div class="tier-radio"></div>
+        <div class="tier-info"><div class="tier-name">Full + Removal Guide</div><div class="tier-desc">Per-site removal instructions, email templates, expungement resources</div></div>
+        <div class="tier-price">$99</div>
+      </label>
+    </div>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">Estimated time: 1-2 minutes. Status will auto-update when done.</p>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" id="confirm-btn" onclick="confirmRunAudit()">Run Audit</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.3);"></div>
+
+<script>
+let TOKEN = '';
+let allLeads = [];
+let currentFilter = '';
+let searchQuery = '';
+let sortField = 'created_at';
+let sortDir = 'desc';
+let selectedTier = 'free';
+
+const API_BASE = '/api/reputation';
+
+// ── AUTH ──
+function doLogin() {
+  TOKEN = document.getElementById('token-input').value.trim();
+  if (!TOKEN) return;
+
+  fetch(API_BASE + '/leads', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => {
+      if (r.ok) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        sessionStorage.setItem('fmr_token', TOKEN);
+        return r.json();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+        throw new Error('Unauthorized');
+      }
+    })
+    .then(data => {
+      allLeads = data.leads;
+      renderAll();
+    })
+    .catch(err => { if (err.message !== 'Unauthorized') console.error(err); });
+}
+
+function doLogout() {
+  TOKEN = '';
+  sessionStorage.removeItem('fmr_token');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('token-input').value = '';
+}
+
+// Auto-login from session
+window.addEventListener('load', () => {
+  const saved = sessionStorage.getItem('fmr_token');
+  if (saved) {
+    TOKEN = saved;
+    document.getElementById('token-input').value = saved;
+    doLogin();
+  }
+  document.getElementById('token-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+// ── DATA ──
+function loadLeads() {
+  auditCache = {};
+  fetch(API_BASE + '/leads', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => r.json())
+    .then(data => { allLeads = data.leads; renderAll(); })
+    .catch(err => { showToast('Error loading leads: ' + err.message); });
+}
+
+function renderAll() {
+  renderStats();
+  renderTable();
+}
+
+function renderStats() {
+  const tierPrices = { free: 0, full: 29, managed: 99 };
+  const counts = { total: allLeads.length, pending: 0, running: 0, completed: 0, paid: 0 };
+  let revenue = 0;
+  let avgScore = 0;
+  let scored = 0;
+  let emailsSent = 0;
+  let opened = 0;
+  let bounced = 0;
+  let complained = 0;
+  let replied = 0;
+  let converted = 0;
+  let unsubscribed = 0;
+  let tierFree = 0;
+  let tierFull = 0;
+  let tierManaged = 0;
+  let fu1 = 0, fu2 = 0, fu3 = 0;
+
+  allLeads.forEach(l => {
+    if (counts[l.status] !== undefined) counts[l.status]++;
+    if (l.status === 'paid') revenue += (tierPrices[l.tier] || 0);
+    if (l.score != null) { avgScore += l.score; scored++; }
+
+    const os = l.outreach_status || 'not_sent';
+    if (os !== 'not_sent') emailsSent++;
+    if (l.opened_at) opened++;
+    if (l.bounce_status === 'bounced') bounced++;
+    if (l.bounce_status === 'complained') complained++;
+    if (os === 'replied') replied++;
+    if (os === 'converted') converted++;
+    if (l.unsubscribed) unsubscribed++;
+
+    if (l.tier === 'free') tierFree++;
+    else if (l.tier === 'full') tierFull++;
+    else if (l.tier === 'managed') tierManaged++;
+
+    const fuc = l.follow_up_count || 0;
+    if (fuc >= 1) fu1++;
+    if (fuc >= 2) fu2++;
+    if (fuc >= 3) fu3++;
+  });
+  avgScore = scored > 0 ? Math.round(avgScore / scored) : 0;
+
+  const openRate = emailsSent > 0 ? Math.round((opened / emailsSent) * 100) : 0;
+  const bounceRate = emailsSent > 0 ? Math.round(((bounced + complained) / emailsSent) * 100) : 0;
+  const bounceColor = bounceRate > 5 ? 'var(--red)' : 'var(--text-dim)';
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${counts.total}</div><div class="stat-label">Total Scans</div></div>
+    <div class="stat-card"><div class="stat-num">${tierFree}/<span style="color:var(--accent-bright)">${tierFull}</span>/<span style="color:#34d399;">${tierManaged}</span></div><div class="stat-label">Free / Full / Guide</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#34d399;">$${revenue.toLocaleString()}</div><div class="stat-label">Revenue</div></div>
+    <div class="stat-card"><div class="stat-num">${openRate}%</div><div class="stat-label">Open Rate (${opened}/${emailsSent})</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:${bounceColor};">${bounceRate}%</div><div class="stat-label">Bounce Rate (${bounced + complained})</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#a78bfa;">${replied}</div><div class="stat-label">Replies</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--text-dim);">${unsubscribed}</div><div class="stat-label">Unsubscribed</div></div>
+    <div class="stat-card"><div class="stat-num">${fu1}/${fu2}/${fu3}</div><div class="stat-label">Follow-ups 1/2/3</div></div>
+  `;
+
+  // Revenue funnel
+  const funnelEl = document.getElementById('revenue-funnel');
+  if (funnelEl) {
+    const clickedUpgrade = converted + tierFull + tierManaged;
+    const funnelSteps = [
+      { label: 'Scans', value: counts.total, color: 'var(--text-bright)' },
+      { label: 'Emails Sent', value: emailsSent, color: 'var(--accent-bright)' },
+      { label: 'Opened', value: opened, color: '#f59e0b' },
+      { label: 'Replied', value: replied, color: '#a78bfa' },
+      { label: 'Upgraded', value: counts.paid, color: '#10b981' },
+    ];
+    const maxVal = Math.max(counts.total, 1);
+    funnelEl.innerHTML = funnelSteps.map(s => {
+      const pct = Math.max(Math.round((s.value / maxVal) * 100), 2);
+      return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+        <span style="min-width:90px;font-size:12px;color:var(--text-dim);text-align:right;">${s.label}</span>
+        <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:22px;overflow:hidden;">
+          <div style="width:${pct}%;background:${s.color};height:100%;border-radius:4px;opacity:0.7;"></div>
+        </div>
+        <span style="min-width:36px;font-size:13px;font-weight:600;color:${s.color};">${s.value}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+function timeAgo(dateStr) {
+  const now = new Date();
+  const then = new Date(dateStr);
+  const diffMs = now - then;
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return diffMins + 'm ago';
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return diffHrs + 'h ago';
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays === 1) return '1 day ago';
+  return diffDays + ' days ago';
+}
+
+function getFiltered() {
+  let list = allLeads;
+  if (currentFilter) {
+    if (currentFilter === 'has_email') {
+      list = list.filter(l => l.email && l.email.includes('@'));
+    } else if (currentFilter === 'no_email') {
+      list = list.filter(l => !l.email || !l.email.includes('@'));
+    } else if (currentFilter.startsWith('tier_')) {
+      const tierVal = currentFilter.replace('tier_', '');
+      list = list.filter(l => l.tier === tierVal);
+    } else if (currentFilter.startsWith('outreach_')) {
+      const outreachVal = currentFilter.replace('outreach_', '');
+      list = list.filter(l => (l.outreach_status || 'not_sent') === outreachVal);
+    } else {
+      list = list.filter(l => l.status === currentFilter);
+    }
+  }
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(l =>
+      (l.full_name || '').toLowerCase().includes(q) ||
+      (l.city || '').toLowerCase().includes(q) ||
+      (l.state || '').toLowerCase().includes(q) ||
+      (l.email || '').toLowerCase().includes(q)
+    );
+  }
+  // Sort
+  list = list.slice().sort((a, b) => {
+    let va = a[sortField], vb = b[sortField];
+    if (va == null) va = '';
+    if (vb == null) vb = '';
+    if (sortField === 'created_at') { va = new Date(va); vb = new Date(vb); }
+    else if (sortField === 'score') { va = Number(va) || 0; vb = Number(vb) || 0; }
+    else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return list;
+}
+
+function renderSortArrows() {
+  document.querySelectorAll('th.sortable').forEach(th => {
+    const arrow = th.querySelector('.sort-arrow');
+    if (th.dataset.sort === sortField) {
+      arrow.textContent = sortDir === 'asc' ? ' \u25B2' : ' \u25BC';
+    } else {
+      arrow.textContent = '';
+    }
+  });
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  const tbody = document.getElementById('leads-table');
+  const empty = document.getElementById('empty-state');
+  renderSortArrows();
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const tierLabels = { free: 'Free', full: '$29', managed: '$99' };
+  const gradeOrder = ['A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F'];
+
+  tbody.innerHTML = filtered.map(l => {
+    const date = new Date(l.created_at);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const ago = timeAgo(l.created_at);
+    const diffDays = Math.floor((new Date() - date) / 86400000);
+    const staleClass = diffDays >= 7 ? ' stale' : '';
+    const grade = l.grade || '';
+    const gradeClass = grade ? 'grade-' + grade.charAt(0) : '';
+    const score = l.score != null ? l.score : '—';
+    const slug = (l.full_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+$/, '');
+    const isCompleted = l.status === 'completed' || l.status === 'paid';
+
+    return `<tr class="lead-row" id="lead-row-${l.id}" onclick="toggleAuditHistory(${l.id}, event)">
+      <td><div class="lead-name">${esc(l.full_name)}</div></td>
+      <td><span class="lead-meta">${esc(l.city)}, ${esc(l.state)}</span></td>
+      <td class="lead-email"><a href="mailto:${esc(l.email)}" onclick="event.stopPropagation()">${esc(l.email)}</a></td>
+      <td style="text-align:center;font-weight:600;color:var(--text-bright);">${score}</td>
+      <td style="text-align:center;">${grade ? '<span class="grade ' + gradeClass + '">' + grade + '</span>' : '—'}</td>
+      <td><span style="font-weight:600;">${tierLabels[l.tier] || l.tier}</span></td>
+      <td><span class="status status-${l.status}">${l.status}</span></td>
+      <td><span class="outreach outreach-${l.outreach_status || 'not_sent'}">${(l.outreach_status || 'not_sent').replace('_', ' ')}</span></td>
+      <td style="text-align:center;"><span style="font-weight:600;color:${(l.follow_up_count||0) >= 3 ? 'var(--green)' : (l.follow_up_count||0) > 0 ? 'var(--accent-bright)' : 'var(--text-dim)'};">${l.follow_up_count || 0}/3</span></td>
+      <td>
+        <span class="lead-meta">${dateStr}</span>
+        <div class="days-ago${staleClass}">${ago}</div>
+      </td>
+      <td>
+        ${isCompleted ? '<button class="pdf-quick" onclick="event.stopPropagation(); viewPDF(' + l.id + ')" title="View PDF">&#128196;</button> ' : ''}<div class="actions-wrap">
+          <button class="actions-btn" onclick="event.stopPropagation(); toggleMenu(this)">Actions &#9662;</button>
+          <div class="actions-menu">
+            <button onclick="promptRunAudit(${l.id}, '${esc(l.full_name)}', '${esc(l.city)}', '${esc(l.state)}')">&#9654; Run Audit</button>
+            <button onclick="sendReport(${l.id}, '${esc(l.full_name)}')" ${isCompleted ? '' : 'disabled'}>&#128231; Send Report</button>
+            <button onclick="viewLog(${l.id}, '${esc(l.full_name)}')">&#128203; View Log</button>
+            <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
+            <button onclick="updateStatus(${l.id}, 'pending')">Mark Pending</button>
+            <button onclick="updateStatus(${l.id}, 'completed')">Mark Completed</button>
+            <button onclick="updateStatus(${l.id}, 'paid')">Mark Paid</button>
+            <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
+            <button onclick="updateOutreach(${l.id}, 'sent')">Outreach: Sent</button>
+            <button onclick="updateOutreach(${l.id}, 'replied')">Outreach: Replied</button>
+            <button onclick="updateOutreach(${l.id}, 'converted')">Outreach: Converted</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr class="audit-history-row" id="audit-row-${l.id}">
+      <td colspan="11">
+        <div class="audit-history" id="audit-history-${l.id}">
+          <div class="audit-history-loading">Loading...</div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── FILTERS ──
+document.getElementById('filters').addEventListener('click', e => {
+  if (e.target.classList.contains('filter-btn')) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentFilter = e.target.dataset.filter;
+    renderTable();
+  }
+});
+
+// ── SORTING ──
+document.querySelector('thead').addEventListener('click', e => {
+  const th = e.target.closest('th.sortable');
+  if (!th) return;
+  const field = th.dataset.sort;
+  if (sortField === field) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField = field;
+    sortDir = field === 'score' ? 'desc' : 'asc';
+  }
+  renderTable();
+});
+
+// ── SEARCH ──
+function onSearch() {
+  searchQuery = document.getElementById('search-input').value.trim();
+  renderTable();
+}
+
+// ── ACTIONS ──
+function toggleMenu(btn) {
+  const menu = btn.nextElementSibling;
+  document.querySelectorAll('.actions-menu.show').forEach(m => { if (m !== menu) m.classList.remove('show'); });
+  menu.classList.toggle('show');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.classList.contains('actions-btn')) {
+    document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  }
+});
+
+function updateStatus(id, status) {
+  document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  fetch(API_BASE + '/leads/' + id + '/status', {
+    method: 'PATCH',
+    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  })
+  .then(r => r.json())
+  .then(() => { showToast('Status updated to ' + status); loadLeads(); })
+  .catch(err => { showToast('Error: ' + err.message); });
+}
+
+function updateOutreach(id, status) {
+  document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  fetch(API_BASE + '/leads/' + id, {
+    method: 'PATCH',
+    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outreach_status: status })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      const lead = allLeads.find(l => l.id === id);
+      if (lead) lead.outreach_status = status;
+      renderAll();
+      showToast('Outreach updated to ' + status);
+    }
+  })
+  .catch(err => { showToast('Error: ' + err.message); });
+}
+
+// ── VIEW PDF ──
+function viewPDF(leadId) {
+  fetch(API_BASE + '/admin/pdf/' + leadId, {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('PDF not found');
+    return r.blob();
+  })
+  .then(blob => {
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  })
+  .catch(() => { showToast('PDF not found for this lead.'); });
+}
+
+// ── SEND REPORT ──
+function sendReport(id, name) {
+  document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  if (!confirm('Send the PDF report to the customer for "' + name + '"?')) return;
+
+  fetch(API_BASE + '/leads/' + id + '/send-report', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showToast('Report sent!');
+      const lead = allLeads.find(l => l.id === id);
+      if (lead && (!lead.outreach_status || lead.outreach_status === 'not_sent')) {
+        lead.outreach_status = 'sent';
+        renderAll();
+      }
+    } else {
+      showToast('Error: ' + (data.error || 'Failed'));
+    }
+  })
+  .catch(() => { showToast('Network error sending report.'); });
+}
+
+// ── RUN AUDIT ──
+let pendingAuditId = null;
+function promptRunAudit(id, name, city, state) {
+  document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  pendingAuditId = id;
+  selectedTier = 'free';
+  document.getElementById('confirm-title').textContent = 'Run Audit \u2014 ' + name;
+  document.getElementById('confirm-subtitle').textContent = name + ' \u00B7 ' + city + ', ' + state;
+  document.querySelectorAll('.tier-option').forEach(o => o.classList.remove('selected'));
+  document.querySelector('.tier-option').classList.add('selected');
+  document.querySelector('input[name="audit-tier"][value="free"]').checked = true;
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+function selectTier(el, tier) {
+  selectedTier = tier;
+  document.querySelectorAll('.tier-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function closeConfirm() { document.getElementById('confirm-modal').classList.remove('show'); pendingAuditId = null; }
+
+function confirmRunAudit() {
+  if (!pendingAuditId) return;
+  const btn = document.getElementById('confirm-btn');
+  btn.textContent = 'Starting...';
+  btn.disabled = true;
+
+  fetch(API_BASE + '/leads/' + pendingAuditId + '/run-audit?tier=' + encodeURIComponent(selectedTier), {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(data => {
+    closeConfirm();
+    btn.textContent = 'Run Audit';
+    btn.disabled = false;
+    if (data.success) {
+      const tierNames = { free: 'Free Scan', full: 'Full Report', managed: 'Full + Removal Guide' };
+      showToast((tierNames[selectedTier] || 'Audit') + ' started! Check back in 1-2 minutes.');
+      loadLeads();
+    } else {
+      showToast('Error: ' + (data.error || 'Failed to start'));
+    }
+  })
+  .catch(() => {
+    closeConfirm();
+    btn.textContent = 'Run Audit';
+    btn.disabled = false;
+    showToast('Network error.');
+  });
+}
+
+// ── VIEW LOG ──
+let currentLogId = null;
+function viewLog(id, name) {
+  document.querySelectorAll('.actions-menu.show').forEach(m => m.classList.remove('show'));
+  currentLogId = id;
+  document.getElementById('log-title').textContent = 'Audit Log \u2014 ' + name;
+  document.getElementById('log-content').textContent = 'Loading...';
+  document.getElementById('log-modal').classList.add('show');
+  refreshLog();
+}
+
+function refreshLog() {
+  if (!currentLogId) return;
+  fetch(API_BASE + '/leads/' + currentLogId + '/audit-log', {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(data => { document.getElementById('log-content').textContent = data.log || 'No log data.'; })
+  .catch(() => { document.getElementById('log-content').textContent = 'Failed to load log.'; });
+}
+
+function closeLog() { document.getElementById('log-modal').classList.remove('show'); currentLogId = null; }
+
+// ── AUDIT HISTORY (expand row) ──
+let auditCache = {};
+function toggleAuditHistory(leadId, event) {
+  if (event.target.closest('.actions-wrap') || event.target.tagName === 'A' || event.target.closest('.pdf-quick')) return;
+
+  const leadRow = document.getElementById('lead-row-' + leadId);
+  const historyRow = document.getElementById('audit-row-' + leadId);
+
+  if (historyRow.classList.contains('show')) {
+    historyRow.classList.remove('show');
+    leadRow.classList.remove('expanded');
+    return;
+  }
+
+  leadRow.classList.add('expanded');
+  historyRow.classList.add('show');
+
+  if (auditCache[leadId]) {
+    renderAuditHistory(leadId, auditCache[leadId]);
+    return;
+  }
+
+  document.getElementById('audit-history-' + leadId).innerHTML = '<div class="audit-history-loading">Loading audit history...</div>';
+
+  fetch(API_BASE + '/leads/' + leadId + '/audits', {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(data => {
+    auditCache[leadId] = data.audits || [];
+    renderAuditHistory(leadId, auditCache[leadId]);
+  })
+  .catch(() => {
+    document.getElementById('audit-history-' + leadId).innerHTML = '<div class="audit-history-loading">Failed to load.</div>';
+  });
+}
+
+function renderAuditHistory(leadId, audits) {
+  const container = document.getElementById('audit-history-' + leadId);
+  const lead = allLeads.find(l => l.id === leadId);
+  const notesVal = lead ? (lead.notes || '') : '';
+
+  // Detail panel
+  const score = lead && lead.score != null ? lead.score : '—';
+  const grade = lead ? (lead.grade || '—') : '—';
+  const gradeLabel = getGradeLabel(grade);
+  const fuc = lead ? (lead.follow_up_count || 0) : 0;
+  const fuStatus = fuc >= 3 ? 'Complete' : fuc > 0 ? `${fuc}/3 sent` : 'Not started';
+  const firstSent = lead && lead.first_sent_at ? new Date(lead.first_sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+  const lastFu = lead && lead.last_follow_up_at ? new Date(lead.last_follow_up_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+  const openedAt = lead && lead.opened_at ? new Date(lead.opened_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+  const bounceVal = lead && lead.bounce_status ? lead.bounce_status : '—';
+  const deliveredAt = lead && lead.delivered_at ? new Date(lead.delivered_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+
+  const detailHtml = `<div class="detail-grid">
+    <div class="detail-item"><div class="detail-label">Score</div><div class="detail-value">${score}/100</div></div>
+    <div class="detail-item"><div class="detail-label">Grade</div><div class="detail-value">${grade} (${gradeLabel})</div></div>
+    <div class="detail-item"><div class="detail-label">Tier</div><div class="detail-value">${(lead ? lead.tier : '—').replace('managed', 'Full + Guide')}</div></div>
+    <div class="detail-item"><div class="detail-label">Blacklisted Domains</div><div class="detail-value" style="font-size:12px;">${lead && lead.blacklisted_domains ? esc(lead.blacklisted_domains) : 'None'}</div></div>
+    <div class="detail-item"><div class="detail-label">Report Sent</div><div class="detail-value" style="font-size:13px;">${firstSent}</div></div>
+    <div class="detail-item"><div class="detail-label">Follow-ups</div><div class="detail-value" style="font-size:13px;">${fuStatus}${lastFu !== '—' ? ' (last: ' + lastFu + ')' : ''}</div></div>
+    <div class="detail-item"><div class="detail-label">Email Tracking</div><div class="detail-value" style="font-size:12px;">Delivered: ${deliveredAt}<br>Opened: ${openedAt}<br>Bounce: ${bounceVal}</div></div>
+    <div class="detail-item"><div class="detail-label">Unsubscribed</div><div class="detail-value" style="font-size:13px;color:${lead && lead.unsubscribed ? 'var(--red)' : 'var(--green)'};">${lead && lead.unsubscribed ? 'Yes' : 'No'}</div></div>
+  </div>`;
+
+  let auditsHtml = '';
+  if (!audits.length) {
+    auditsHtml = '<div class="audit-none">No audits run yet.</div>';
+  } else {
+    const tierLabels = { free: 'Free', full: 'Full ($29)', managed: 'Full + Guide ($99)' };
+    const items = audits.map(a => {
+      const date = new Date(a.started_at || a.created_at);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+      let pdfLink = '';
+      if (a.status === 'completed' && a.pdf_path) {
+        pdfLink = '<a class="audit-pdf-link" href="#" onclick="event.preventDefault(); event.stopPropagation(); viewPDF(' + lead.id + ')">View PDF</a>';
+      }
+
+      return '<div class="audit-item">' +
+        '<span class="audit-tier">' + esc(tierLabels[a.tier] || a.tier || 'free') + '</span>' +
+        '<span class="status status-' + a.status + '">' + a.status + '</span>' +
+        '<span class="audit-date">' + dateStr + '</span>' +
+        pdfLink +
+      '</div>';
+    }).join('');
+    auditsHtml = '<div class="audit-list">' + items + '</div>';
+  }
+
+  const notesHtml = '<div class="notes-wrap">' +
+    '<div class="notes-label">Notes</div>' +
+    '<textarea class="notes-textarea" id="notes-' + leadId + '" onblur="saveNotes(' + leadId + ')" onclick="event.stopPropagation()" placeholder="Add notes about this lead...">' + esc(notesVal) + '</textarea>' +
+    '<div class="notes-saved" id="notes-saved-' + leadId + '">Saved</div>' +
+  '</div>';
+
+  container.innerHTML = detailHtml + auditsHtml + notesHtml;
+}
+
+function getGradeLabel(grade) {
+  return { 'A+': 'Spotless', A: 'Clean', 'A-': 'Mostly Clean',
+           'B+': 'Low Risk', B: 'Minor Risk', 'B-': 'Some Exposure',
+           'C+': 'Moderate Exposure', C: 'Moderate Risk', 'C-': 'Elevated Risk',
+           'D+': 'High Risk', D: 'Significant Risk', 'D-': 'Severe Risk',
+           F: 'Critical' }[grade] || '';
+}
+
+function saveNotes(leadId) {
+  const textarea = document.getElementById('notes-' + leadId);
+  const notes = textarea.value;
+  const lead = allLeads.find(l => l.id === leadId);
+  if (lead) lead.notes = notes;
+
+  fetch(API_BASE + '/leads/' + leadId, {
+    method: 'PATCH',
+    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      const saved = document.getElementById('notes-saved-' + leadId);
+      saved.style.display = 'block';
+      setTimeout(() => { saved.style.display = 'none'; }, 2000);
+    }
+  })
+  .catch(() => { showToast('Failed to save notes'); });
+}
+
+// ── SEND ALL APPROVED ──
+function sendAllApproved() {
+  // First preview what would be sent
+  fetch(API_BASE + '/leads/send-all-approved?preview=1', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      showToast(data.error);
+      return;
+    }
+    const count = data.will_send || 0;
+    if (count === 0) {
+      showToast('No approved leads to send.');
+      return;
+    }
+    const msg = `Send ${count} report(s)?\n\nDaily limit: ${data.daily_limit}, sent today: ${data.sent_today}, headroom: ${data.headroom}`;
+    if (!confirm(msg)) return;
+
+    fetch(API_BASE + '/leads/send-all-approved', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (result.success) {
+        showToast(result.message);
+        setTimeout(loadLeads, 3000);
+      } else {
+        showToast('Error: ' + (result.error || 'Failed'));
+      }
+    })
+    .catch(() => { showToast('Network error sending reports.'); });
+  })
+  .catch(() => { showToast('Network error checking approved leads.'); });
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+</script>
+
+</body>
+</html>
